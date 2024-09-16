@@ -28,6 +28,10 @@ class AbstractRepository(ABC):
     async def update_one():
         raise NotImplementedError
 
+    @abstractmethod
+    async def delete_one():
+        raise NotImplementedError
+
 
 class SQLAlchemyRepository(AbstractRepository):
     model = None
@@ -61,3 +65,8 @@ class SQLAlchemyRepository(AbstractRepository):
 
         await self.session.commit()
         return item.to_read_model()
+
+    async def delete_one(self, item_id: int):
+        item = await self.__get_one_model(item_id=item_id)
+        await self.session.delete(item)
+        await self.session.commit()

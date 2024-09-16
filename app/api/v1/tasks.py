@@ -1,10 +1,13 @@
-from typing import List
-
-from fastapi import APIRouter
+from fastapi import (
+    APIRouter,
+    status,
+)
 
 from app.api.v1.dependencies import UOWDep
+from app.schemas.api_response import ApiResponseSchema
 from app.schemas.tasks import (
     CreateTaskSchema,
+    ReadListTaskSchema,
     ReadTaskSchema,
     UpdateTaskSchema,
 )
@@ -14,43 +17,77 @@ from app.services.tasks import TaskService
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
 
 
-@router.get("/", response_model=List[ReadTaskSchema])
+@router.get(
+    "/",
+    response_model=ApiResponseSchema[ReadListTaskSchema],
+)
 async def get_tasks(
     uow: UOWDep,
 ):
-    return await TaskService().get_all(uow=uow)
+    return ApiResponseSchema(
+        data=ReadListTaskSchema(tasks=await TaskService().get_all(uow=uow)),
+    )
 
 
-@router.post("/")
+@router.post(
+    "/",
+    response_model=ApiResponseSchema[ReadTaskSchema],
+)
 async def add_task(
     task_in: CreateTaskSchema,
     uow: UOWDep,
 ):
-    return await TaskService().add_task(
-        task_in=task_in,
-        uow=uow,
+    return ApiResponseSchema(
+        data=await TaskService().add_task(
+            task_in=task_in,
+            uow=uow,
+        ),
     )
 
 
-@router.get("/{task_id}", response_model=ReadTaskSchema)
+@router.get(
+    "/{task_id}",
+    response_model=ApiResponseSchema[ReadTaskSchema],
+)
 async def get_task(
     task_id: int,
     uow: UOWDep,
 ):
-    return await TaskService().get_task(
-        task_id=task_id,
-        uow=uow,
+    return ApiResponseSchema(
+        data=await TaskService().get_task(
+            task_id=task_id,
+            uow=uow,
+        ),
     )
 
 
-@router.patch("/{task_id}", response_model=ReadTaskSchema)
+@router.patch(
+    "/{task_id}",
+    response_model=ApiResponseSchema[ReadTaskSchema],
+)
 async def update_task(
     task_id: int,
     task_in: UpdateTaskSchema,
     uow: UOWDep,
 ):
-    return await TaskService().update_task(
+    return ApiResponseSchema(
+        data=await TaskService().update_task(
+            task_id=task_id,
+            task_in=task_in,
+            uow=uow,
+        ),
+    )
+
+
+@router.delete(
+    "/{task_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def delete_task(
+    task_id: int,
+    uow: UOWDep,
+):
+    await TaskService().delete_task(
         task_id=task_id,
-        task_in=task_in,
         uow=uow,
     )

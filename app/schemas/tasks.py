@@ -25,6 +25,10 @@ class ReadTaskSchema(BaseTaskSchema):
     created_at: datetime
 
 
+class ReadListTaskSchema(BaseModel):
+    tasks: list[ReadTaskSchema]
+
+
 class CreateTaskSchema(BaseTaskSchema):
     pass
 

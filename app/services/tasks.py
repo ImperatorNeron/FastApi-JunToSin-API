@@ -27,3 +27,11 @@ class TaskService:
     ):
         async with uow:
             return await uow.tasks.update_one(item_id=task_id, item_in=task_in)
+
+    async def delete_task(
+        self,
+        task_id: int,
+        uow: IUnitOfWork,
+    ):
+        async with uow:
+            await uow.tasks.delete_one(item_id=task_id)
