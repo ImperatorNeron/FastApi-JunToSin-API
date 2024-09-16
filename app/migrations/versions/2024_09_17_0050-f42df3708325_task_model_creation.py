@@ -1,8 +1,8 @@
-"""Task model creation
+"""task model creation
 
-Revision ID: 7ec905884c26
+Revision ID: f42df3708325
 Revises: 
-Create Date: 2024-09-14 00:54:13.084953
+Create Date: 2024-09-17 00:50:27.658991
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '7ec905884c26'
+revision: str = 'f42df3708325'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -25,7 +25,7 @@ def upgrade() -> None:
     sa.Column('Description', sa.String(), nullable=False),
     sa.Column('Complexity', sa.Enum('VERY_EASY', 'EASY', 'MODERATE', 'CHALLENGING', 'DIFFICULT', 'VERY_DIFFICULT', name='complexity'), nullable=False),
     sa.Column('Status', sa.Enum('OPEN', 'IN_PROGRESS', 'COMPLETED', name='status'), nullable=False),
-    sa.Column('Created at', sa.DateTime(), nullable=False),
+    sa.Column('Created at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.Column('Deadline', sa.DateTime(), nullable=True),
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_tasks'))

@@ -1,11 +1,9 @@
-from datetime import (
-    datetime,
-    timezone,
-)
+from datetime import datetime
 
 from sqlalchemy import (
     DateTime,
     Enum,
+    func,
     String,
 )
 from sqlalchemy.orm import (
@@ -23,12 +21,31 @@ from app.utils.enums import (
 
 
 class Task(IdIntPkMixin, BaseModel):
-    title: Mapped[str] = mapped_column("Title", String(255))
+    title: Mapped[str] = mapped_column(
+        "Title",
+        String(255),
+    )
     description: Mapped[str] = mapped_column("Description")
-    complexity: Mapped[Complexity] = mapped_column("Complexity", Enum(Complexity))
-    status: Mapped[Status] = mapped_column("Status", Enum(Status), default=Status.OPEN)
-    created_at: Mapped[datetime] = mapped_column("Created at", DateTime, default=datetime.now(timezone.utc))
-    deadline: Mapped[datetime | None] = mapped_column("Deadline", DateTime, nullable=True)
+    complexity: Mapped[Complexity] = mapped_column(
+        "Complexity",
+        Enum(Complexity),
+    )
+    status: Mapped[Status] = mapped_column(
+        "Status",
+        Enum(Status),
+        default=Status.OPEN,
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        "Created at",
+        DateTime,
+        default=func.now(),
+        server_default=func.now(),
+    )
+    deadline: Mapped[datetime | None] = mapped_column(
+        "Deadline",
+        DateTime,
+        nullable=True,
+    )
 
     def to_read_model(self) -> ReadTaskSchema:
         return ReadTaskSchema(

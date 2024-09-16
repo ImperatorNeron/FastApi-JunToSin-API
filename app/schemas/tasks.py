@@ -21,5 +21,17 @@ class BaseTaskSchema(BaseModel):
 
 
 class ReadTaskSchema(BaseTaskSchema):
-    id: int = Field(ge=0)   # noqa
+    id: int = Field(ge=0)  # noqa
     created_at: datetime
+
+
+class CreateTaskSchema(BaseTaskSchema):
+    pass
+
+
+class UpdateTaskSchema(BaseTaskSchema):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    complexity: Optional[Complexity] = None
+    status: Optional[Status] = None
+    deadline: Optional[datetime] = None
