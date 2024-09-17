@@ -23,6 +23,9 @@ class BaseTaskSchema(BaseModel):
 class ReadTaskSchema(BaseTaskSchema):
     id: int = Field(ge=0)  # noqa
     created_at: datetime
+    updated_at: datetime
+    employed_user_id: int
+    unemployed_user_id: Optional[int] = Field(default=None)
 
 
 class ReadListTaskSchema(BaseModel):
@@ -30,7 +33,7 @@ class ReadListTaskSchema(BaseModel):
 
 
 class CreateTaskSchema(BaseTaskSchema):
-    pass
+    employed_user_id: int
 
 
 class UpdateTaskSchema(BaseTaskSchema):
