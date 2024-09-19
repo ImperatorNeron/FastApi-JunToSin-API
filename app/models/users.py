@@ -13,6 +13,7 @@ from app.models.mixins import (
     IdIntPkMixin,
     UpdateCreateDateTimeMixin,
 )
+from app.schemas.users import ReadEmployedUserSchema
 
 
 class BaseUser(
@@ -81,3 +82,15 @@ class EmployedUser(User):
         "Task",
         back_populates="employed_user",
     )
+
+    def to_read_model(self) -> ReadEmployedUserSchema:
+        return ReadEmployedUserSchema(
+            id=self.id,
+            created_at=self.created_at,
+            updated_at=self.updated_at,
+            username=self.username,
+            email=self.email,
+            hashed_password=self.hashed_password,
+            phone_number=self.phone_number,
+            description=self.description,
+        )

@@ -18,6 +18,16 @@ alembic = "^1.13.2"
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.8.0"
 isort = "^5.13.2"
+pytest = "^8.3.3"
+pytest-asyncio = "^0.24.0"
+factory-boy = "^3.3.1"
+
+[tool.pytest.ini_options]
+pythonpath = [
+    ".", "app",
+]
+asyncio_mode="auto"
+asyncio_default_fixture_loop_scope = "session"
 
 [build-system]
 requires = ["poetry-core"]

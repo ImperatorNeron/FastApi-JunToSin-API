@@ -51,6 +51,7 @@ class Settings(BaseSettings):
     )
     api_version_prefix: str = "/api/v1"
     database: DatabaseSettings
+    test_database: TestDatabaseSettings
 
 
 settings = Settings()
