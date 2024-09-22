@@ -7,7 +7,7 @@
 ## Requirements
 - [Docker](https://www.docker.com/get-started/)
 - [Docker Compose](https://docs.docker.com/compose/install/)
-- [GNU Make](https://www.gnu.org/software/make/)
+- [GNU Make](https://www.gnu.org/software/make/) or [Scons](https://pypi.org/project/SCons/)
 
 
 ## How to Use
@@ -22,18 +22,19 @@ cd your_repository
 ### Implemented Commands
 
 #### Application
-- ```make app``` - up application
-- ```make app-logs``` - follow the logs in app container
-- ```make app-down``` - down application and all 
+Choose make or scons:
+- ```make\scons up``` - up application
+- ```make\scons logs``` - follow the logs in app container
+- ```make\scons down``` - down application and all 
 #### Storages
-- ```make storages``` - up PostgreSql
-- ```make storages-logs``` - follow the logs in postgres container
-- ```make storages-down``` - down PostgreSql
+- ```make\scons storages``` - up PostgreSql
+- ```make\scons storages-logs``` - follow the logs in postgres container
+- ```make\scons storages-down``` - down PostgreSql
 #### Migrations
-- ```make migrations``` - do alembic revision
-- ```make auto-migrations``` - do alembic revision with autogenerate
-- ```make migrate-up``` - do migrations (to head)
-- ```make migrate-down``` - do migrations downgrate (-1)
+- ```make\scons migrations``` - do alembic revision
+- ```make\scons auto-migrations``` - do alembic revision with autogenerate
+- ```make\scons migrate-up``` - do migrations (to head)
+- ```make\scons migrate-down``` - do migrations downgrate (-1)
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](https://en.wikipedia.org/wiki/MIT_License) file for details.

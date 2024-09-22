@@ -22,4 +22,4 @@ wait_for_port() {
 
 wait_for_port "postgres" 5432
 
-uvicorn --factory main:create_app --reload --host 0.0.0.0 --port 8000
+uvicorn --factory app.main:create_app --reload --host 0.0.0.0 --port 8000

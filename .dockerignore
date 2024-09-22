@@ -4,3 +4,4 @@ __pycache__
 *.pyc
 docker_compose/
 .pytest_cache/
+.sconsign.dblite
