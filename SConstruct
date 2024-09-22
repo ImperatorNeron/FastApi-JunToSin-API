@@ -39,7 +39,7 @@ def app_logs(target, source, env):
 
 
 def app_down(target, source, env):
-    command = f"{DC} -f {APP_FILE} -f {STORAGES_FILE} {ENV} up -d"
+    command = f"{DC} -f {APP_FILE} -f {STORAGES_FILE} {ENV} down"
     return os.system(command)
 
 
