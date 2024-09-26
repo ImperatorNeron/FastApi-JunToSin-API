@@ -7,12 +7,13 @@ license = "MIT"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.11"
 fastapi = {extras = ["all"], version = "^0.114.1"}
 python-dotenv = "^1.0.1"
 sqlalchemy = {extras = ["asyncpg"], version = "^2.0.34"}
 asyncpg = "^0.29.0"
 alembic = "^1.13.2"
+fastapi-users = {extras = ["sqlalchemy"], version = "^13.0.0"}
 
 
 [tool.poetry.group.dev.dependencies]

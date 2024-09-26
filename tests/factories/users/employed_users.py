@@ -4,7 +4,7 @@ import factory
 from factory.alchemy import SQLAlchemyModelFactory
 
 from app.db.db import test_database_helper
-from app.models.users import EmployedUser
+from app.models.roled_users import EmployedUser
 
 
 class EmployedUsersModelFactory(SQLAlchemyModelFactory):

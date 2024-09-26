@@ -25,7 +25,7 @@ class ReadTaskSchema(BaseTaskSchema):
     created_at: datetime
     updated_at: datetime
     employed_user_id: int
-    unemployed_user_id: Optional[int] = Field(default=None)
+    unemployed_user_id: Optional[int] = None
 
 
 class ReadListTaskSchema(BaseModel):
@@ -36,7 +36,7 @@ class CreateTaskSchema(BaseTaskSchema):
     employed_user_id: int
 
 
-class UpdateTaskSchema(BaseTaskSchema):
+class UpdateTaskSchema(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
     complexity: Optional[Complexity] = None

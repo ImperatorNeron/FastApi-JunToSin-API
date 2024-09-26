@@ -2,7 +2,7 @@ import pytest
 from httpx import AsyncClient
 from tests.factories.users.employed_users import EmployedUsersModelFactory
 
-from app.models.users import EmployedUser
+from app.models.roled_users import EmployedUser
 
 
 @pytest.mark.asyncio(loop_scope="session")

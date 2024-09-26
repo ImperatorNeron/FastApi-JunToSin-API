@@ -14,3 +14,9 @@ class Status(enum.Enum):
     OPEN = "Open"
     IN_PROGRESS = "In progress"
     COMPLETED = "Completed"
+
+
+class UserRole(enum.Enum):
+    ADMIN = "admin"
+    EMPLOYED = "employed"
+    UNEMPLOYED = "unemployed"

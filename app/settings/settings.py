@@ -42,6 +42,12 @@ class TestDatabaseSettings(DatabaseBaseSettings):
     pass
 
 
+class AccessTokenSettings(BaseModel):
+    lifetime_seconds: int = 3600
+    reset_password_token_secret: str
+    verification_token_secret: str
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=(".env.template", ".env"),
@@ -52,6 +58,7 @@ class Settings(BaseSettings):
     api_version_prefix: str = "/api/v1"
     database: DatabaseSettings
     test_database: TestDatabaseSettings
+    access_token: AccessTokenSettings
 
 
 settings = Settings()

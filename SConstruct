@@ -50,7 +50,7 @@ def migrations(target, source, env):
 
 
 def auto_migrations(target, source, env):
-    message = env.get("message", "default migration")
+    message = env.get("message", "default")
     command = f"{EXEC} {APP_CONTAINER} {ALREV} --autogenerate -m '{message}'"
     return os.system(command)
 

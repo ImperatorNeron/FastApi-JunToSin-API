@@ -17,6 +17,10 @@ from app.models.mixins import (
     IdIntPkMixin,
     UpdateCreateDateTimeMixin,
 )
+from app.models.roled_users import (
+    EmployedUser,
+    UnemployedUser,
+)
 from app.schemas.tasks import ReadTaskSchema
 from app.utils.enums import (
     Complexity,
@@ -30,35 +34,37 @@ class Task(
     BaseModel,
 ):
     title: Mapped[str] = mapped_column(
-        "Title",
         String(255),
     )
-    description: Mapped[str] = mapped_column("Description")
+    description: Mapped[str] = mapped_column(
+        String,
+    )
     complexity: Mapped[Complexity] = mapped_column(
-        "Complexity",
         Enum(Complexity),
     )
     status: Mapped[Status] = mapped_column(
-        "Status",
         Enum(Status),
         default=Status.OPEN,
     )
     deadline: Mapped[datetime | None] = mapped_column(
-        "Deadline",
         DateTime,
         nullable=True,
     )
     employed_user_id: Mapped[int] = mapped_column(
-        "Employed user",
-        ForeignKey("employedusers.id"),
+        ForeignKey(EmployedUser.user_id),
     )
     unemployed_user_id: Mapped[int] = mapped_column(
-        "Unemployed user",
-        ForeignKey("unemployedusers.id"),
+        ForeignKey(UnemployedUser.user_id),
         nullable=True,
     )
-    employed_user = relationship("EmployedUser", back_populates="tasks")
-    unemployed_user = relationship("UnemployedUser", back_populates="tasks")
+    employed_user: Mapped[EmployedUser] = relationship(
+        "EmployedUser",
+        back_populates="tasks",
+    )
+    unemployed_user: Mapped[UnemployedUser] = relationship(
+        "UnemployedUser",
+        back_populates="tasks",
+    )
 
     def to_read_model(self) -> ReadTaskSchema:
         return ReadTaskSchema(
@@ -70,8 +76,8 @@ class Task(
             created_at=self.created_at,
             deadline=self.deadline,
             updated_at=self.updated_at,
-            employed_user_id=self.employed_user_id,
             unemployed_user_id=self.unemployed_user_id,
+            employed_user_id=self.employed_user_id,
         )
 
     def __repr__(self):

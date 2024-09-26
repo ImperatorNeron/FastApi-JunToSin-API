@@ -9,12 +9,10 @@ from app.db.db import (
     test_database_helper,
 )
 from app.repositories.tasks import TaskRepository
-from app.repositories.users import EmployedUserRepository
 
 
 class IUnitOfWork(ABC):
     tasks: Type[TaskRepository]
-    employed_users: Type[EmployedUserRepository]
 
     @abstractmethod
     async def __aenter__(self): ...
@@ -34,7 +32,6 @@ class UnitOfWork(IUnitOfWork):
     async def __aenter__(self):
         self.session = database_helper.session_factory()
         self.tasks = TaskRepository(self.session)
-        self.employed_users = EmployedUserRepository(self.session)
 
     async def __aexit__(self, *args):
         await self.rollback()
@@ -52,7 +49,6 @@ class TestUnitOfWork(IUnitOfWork):
     async def __aenter__(self):
         self.session = test_database_helper.session_factory()
         self.tasks = TaskRepository(self.session)
-        self.employed_users = EmployedUserRepository(self.session)
 
     async def __aexit__(self, *args):
         await self.rollback()
