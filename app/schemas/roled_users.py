@@ -11,9 +11,26 @@ class ReadEmployedUserSchema(BaseEmployedUserSchema):
     user_id: int
 
 
-class CreateEmployedUserSchema(BaseEmployedUserSchema):
+class CreateEmployedUserSchema(ReadEmployedUserSchema):
     pass
 
 
 class UpdateEmployedUserSchema(BaseEmployedUserSchema):
+    pass
+
+
+class BaseUnemployedUserSchema(BaseModel):
+    linkedin_url: Optional[str] = None
+    achivements: Optional[str] = None
+
+
+class ReadUnemployedUserSchema(BaseUnemployedUserSchema):
+    user_id: int
+
+
+class CreateUnemployedUserSchema(ReadUnemployedUserSchema):
+    pass
+
+
+class UpdateUnemployedUserSchema(BaseUnemployedUserSchema):
     pass

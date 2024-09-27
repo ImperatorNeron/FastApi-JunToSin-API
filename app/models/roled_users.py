@@ -15,7 +15,10 @@ from sqlalchemy.orm import (
 
 from app.models.base import BaseModel
 from app.models.mixins import UserRelationMixin
-from app.schemas.roled_users import ReadEmployedUserSchema
+from app.schemas.roled_users import (
+    ReadEmployedUserSchema,
+    ReadUnemployedUserSchema,
+)
 
 
 if TYPE_CHECKING:
@@ -59,6 +62,13 @@ class UnemployedUser(BaseModel, UserRelationMixin):
         "Task",
         back_populates="unemployed_user",
     )
+
+    def to_read_model(self) -> ReadUnemployedUserSchema:
+        return ReadUnemployedUserSchema(
+            user_id=self.user_id,
+            linkedin_url=self.linkedin_url,
+            achivements=self.achivements,
+        )
 
 
 class AdminUser(BaseModel, UserRelationMixin):

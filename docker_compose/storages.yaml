@@ -9,7 +9,7 @@ services:
     ports:
       - "${APP_CONFIG__DATABASE__port}:5432"
     volumes:
-      - postgresql_data:/var/lib/postgres/data
+      - postgresql_data:/var/lib/postgresql/data
     env_file:
       - ../.env
 
