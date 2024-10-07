@@ -1,11 +1,9 @@
 from typing import TYPE_CHECKING
 
-from fastapi_users_db_sqlalchemy import (
-    SQLAlchemyBaseUserTable,
-    SQLAlchemyUserDatabase,
-)
 from sqlalchemy import (
+    Boolean,
     Enum,
+    LargeBinary,
     String,
 )
 from sqlalchemy.orm import (
@@ -19,42 +17,58 @@ from app.models.mixins import (
     IdIntPkMixin,
     UpdateCreateDateTimeMixin,
 )
+from app.schemas.auth_users import ReadUserWithPasswordSchema
 from app.utils.enums import UserRole
 
 
 if TYPE_CHECKING:
-    from sqlalchemy.ext.asyncio import AsyncSession
-
     from app.models.roled_users import (
         AdminUser,
         EmployedUser,
         UnemployedUser,
     )
-    from app.models.tokens import AccessToken
 
 
 class User(
-    SQLAlchemyBaseUserTable[int],
     IdIntPkMixin,
     UpdateCreateDateTimeMixin,
     BaseModel,
 ):
 
-    __tablename__ = "users"
-
+    email: Mapped[str] = mapped_column(
+        String(length=320),
+        unique=True,
+        index=True,
+    )
+    hashed_password: Mapped[bytes] = mapped_column(
+        LargeBinary,
+    )
+    is_active: Mapped[bool] = mapped_column(
+        Boolean,
+        default=True,
+        server_default="true",
+    )
+    is_superuser: Mapped[bool] = mapped_column(
+        Boolean,
+        default=False,
+        server_default="false",
+    )
+    is_verified: Mapped[bool] = mapped_column(
+        Boolean,
+        default=False,
+        server_default="false",
+    )
     username: Mapped[str] = mapped_column(
         String(50),
         unique=True,
     )
     phone_number: Mapped[str] = mapped_column(
         String(12),
-        nullable=True,
     )
     role: Mapped[UserRole] = mapped_column(
         Enum(UserRole),
         default=UserRole.UNEMPLOYED,
     )
-
     admin_user: Mapped["AdminUser"] = relationship(
         "AdminUser",
         back_populates="user",
@@ -69,11 +83,20 @@ class User(
         back_populates="user",
     )
 
-    access_token: Mapped["AccessToken"] = relationship(
-        "AccessToken",
-        back_populates="user",
-    )
+    def to_read_model(self) -> ReadUserWithPasswordSchema:
+        return ReadUserWithPasswordSchema(
+            id=self.id,
+            email=self.email,
+            username=self.username,
+            phone_number=self.phone_number,
+            is_active=self.is_active,
+            is_superuser=self.is_superuser,
+            is_verified=self.is_verified,
+            role=self.role,
+            created_at=self.created_at,
+            updated_at=self.updated_at,
+            hashed_password=self.hashed_password,
+        )
 
-    @classmethod
-    def get_db(cls, session: "AsyncSession"):
-        return SQLAlchemyUserDatabase(session, cls)
+    def __repr__(self):
+        return f"<User-{self.id}, username={self.username}, role={self.role}>"

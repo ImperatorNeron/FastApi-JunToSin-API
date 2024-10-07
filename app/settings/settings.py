@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from dotenv import load_dotenv
 from pydantic import BaseModel
 from pydantic_settings import (
@@ -7,6 +9,8 @@ from pydantic_settings import (
 
 
 load_dotenv()
+
+BASE_DIR = Path(__file__).parent.parent
 
 
 class DatabaseBaseSettings(BaseModel):
@@ -42,10 +46,11 @@ class TestDatabaseSettings(DatabaseBaseSettings):
     pass
 
 
-class AccessTokenSettings(BaseModel):
-    lifetime_seconds: int = 3600
-    reset_password_token_secret: str
-    verification_token_secret: str
+class AuthJWT(BaseModel):
+    private_key_path: Path = BASE_DIR / "certificates" / "private.pem"
+    public_key_path: Path = BASE_DIR / "certificates" / "public.pem"
+    algorithm: str = "RS256"
+    access_token_expire_minutes: int = 15
 
 
 class Settings(BaseSettings):
@@ -58,7 +63,7 @@ class Settings(BaseSettings):
     api_version_prefix: str = "/api/v1"
     database: DatabaseSettings
     test_database: TestDatabaseSettings
-    access_token: AccessTokenSettings
+    auth_jwt: AuthJWT = AuthJWT()
 
 
 settings = Settings()

@@ -16,25 +16,23 @@ class BaseRoledUserService(ABC):
     async def register(self, user_id: int, uow: IUnitOfWork) -> None: ...
 
 
-class EmployedUserService:
+class EmployedUserService(BaseRoledUserService):
 
     async def register(
         self,
         user_id: int,
         uow: IUnitOfWork,
-    ):
-        async with uow:
-            user_in = CreateEmployedUserSchema(user_id=user_id)
-            await uow.employed_users.add_one(item_in=user_in)
+    ) -> None:
+        user_in = CreateEmployedUserSchema(user_id=user_id)
+        await uow.employed_users.add_one(item_in=user_in)
 
 
-class UnemployedUserService:
+class UnemployedUserService(BaseRoledUserService):
 
     async def register(
         self,
         user_id: int,
         uow: IUnitOfWork,
-    ):
-        async with uow:
-            user_in = CreateUnemployedUserSchema(user_id=user_id)
-            await uow.unemployed_users.add_one(item_in=user_in)
+    ) -> None:
+        user_in = CreateUnemployedUserSchema(user_id=user_id)
+        await uow.unemployed_users.add_one(item_in=user_in)

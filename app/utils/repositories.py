@@ -57,6 +57,11 @@ class SQLAlchemyRepository(AbstractRepository):
         item = await self.__get_one_model(item_id=item_id)
         return item.to_read_model()
 
+    async def get_one_by_field(self, field_name: str, value):
+        field = getattr(self.model, field_name, None)
+        item = await self.session.execute(select(self.model).where(field == value))
+        return item.scalars().first().to_read_model()
+
     async def update_one(self, item_id: int, item_in: BaseModel):
         item = await self.__get_one_model(item_id=item_id)
 

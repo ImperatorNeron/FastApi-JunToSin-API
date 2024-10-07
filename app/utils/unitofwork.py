@@ -8,6 +8,7 @@ from app.db.db import (
     database_helper,
     test_database_helper,
 )
+from app.repositories.auth_user import AuthUserRepository
 from app.repositories.roled_users import (
     EmployedUserRepository,
     UnemployedUserRepository,
@@ -17,6 +18,7 @@ from app.repositories.tasks import TaskRepository
 
 class IUnitOfWork(ABC):
     tasks: Type[TaskRepository]
+    auth_users: Type[AuthUserRepository]
     employed_users: Type[EmployedUserRepository]
     unemployed_users: Type[UnemployedUserRepository]
 
@@ -38,6 +40,7 @@ class UnitOfWork(IUnitOfWork):
     async def __aenter__(self):
         self.session = database_helper.session_factory()
         self.tasks = TaskRepository(self.session)
+        self.auth_users = AuthUserRepository(self.session)
         self.employed_users = EmployedUserRepository(self.session)
         self.unemployed_users = UnemployedUserRepository(self.session)
 
@@ -57,6 +60,7 @@ class TestUnitOfWork(IUnitOfWork):
     async def __aenter__(self):
         self.session = test_database_helper.session_factory()
         self.tasks = TaskRepository(self.session)
+        self.auth_users = AuthUserRepository(self.session)
         self.employed_users = EmployedUserRepository(self.session)
         self.unemployed_users = UnemployedUserRepository(self.session)
 

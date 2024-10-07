@@ -13,7 +13,10 @@ python-dotenv = "^1.0.1"
 sqlalchemy = {extras = ["asyncpg"], version = "^2.0.34"}
 asyncpg = "^0.29.0"
 alembic = "^1.13.2"
-fastapi-users = {extras = ["sqlalchemy"], version = "^13.0.0"}
+pyjwt = {extras = ["crypto"], version = "^2.9.0"}
+bcrypt = "^4.2.0"
+punq = "^0.7.0"
+python-multipart = "^0.0.12"
 
 
 [tool.poetry.group.dev.dependencies]
