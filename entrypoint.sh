@@ -1,6 +1,6 @@
 wait_for_port() {
-    local host=${APP_CONFIG__DATABASE__host}
-    local port=${APP_CONFIG__DATABASE__port}
+    local host=$1
+    local port=$2
     local timeout=10
     local start_time=$(date +%s)
 
@@ -20,6 +20,7 @@ wait_for_port() {
     done
 }
 
-wait_for_port "postgres" 5432
+wait_for_port "${POSTGRES_HOST}" "${POSTGRES_PORT}"
+wait_for_port "${TEST_POSTGRES_HOST}" "${POSTGRES_PORT}"
 
 uvicorn --factory app.main:create_app --reload --host 0.0.0.0 --port 8000

@@ -8,7 +8,7 @@ from app.schemas.profiles import (
     EmployedUserProfileSchema,
     UnemployedUserProfileSchema,
 )
-from app.utils.repositories import SQLAlchemyRepository
+from app.utils.sql_repository import SQLAlchemyRepository
 
 
 class AuthUserRepository(SQLAlchemyRepository):

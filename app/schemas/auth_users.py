@@ -41,3 +41,7 @@ class ReadUserSchema(BaseUserSchema):
 
 class ReadUserWithPasswordSchema(ReadUserSchema):
     hashed_password: bytes
+
+
+class UpdateUserVerificationSchema(BaseModel):
+    is_verified: bool

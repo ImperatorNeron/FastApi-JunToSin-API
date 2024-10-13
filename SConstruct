@@ -6,11 +6,14 @@ EXEC = "docker exec -it"
 APP_FILE = "docker_compose/app.yaml"
 APP_CONTAINER = "main-app"
 STORAGES_FILE = "docker_compose/storages.yaml"
+TEST_STORAGES_FILE = "docker_compose/test_storages.yaml"
 STORAGES_CONTAINER = "postgresql-container"
-ENV = "--env-file .env"
+TEST_STORAGES_CONTAINER = "postgresql-test-container"
+ENV = "--env-file .env.docker"
 ALREV = "alembic revision"
 ALUP = "alembic upgrade"
 ALDOWN = "alembic downgrade"
+TEST = "pytest"
 
 
 def storages(target, source, env):
@@ -29,7 +32,7 @@ def storages_down(target, source, env):
 
 
 def app(target, source, env):
-    command = f"{DC} -f {APP_FILE} -f {STORAGES_FILE} {ENV} up --build -d"
+    command = f"{DC} -f {APP_FILE} -f {STORAGES_FILE} -f {TEST_STORAGES_FILE} {ENV} up --build -d"
     return os.system(command)
 
 
@@ -39,7 +42,7 @@ def app_logs(target, source, env):
 
 
 def app_down(target, source, env):
-    command = f"{DC} -f {APP_FILE} -f {STORAGES_FILE} {ENV} down"
+    command = f"{DC} -f {APP_FILE} -f {STORAGES_FILE} -f {TEST_STORAGES_FILE} {ENV} down"
     return os.system(command)
 
 
@@ -65,13 +68,20 @@ def migrate_down(target, source, env):
     return os.system(command)
 
 
-Command("storages", [], storages) 
-Command("storages-down", [], storages_down)  
-Command("storages-logs", [], storages_logs)  
-Command("up", [], app)  
-Command("down", [], app_down)  
-Command("logs", [], app_logs) 
-Command("migrations", [], migrations)  
-Command("auto-migrations", [], auto_migrations)  
-Command("migrate-up", [], migrate_up)  
-Command("migrate-down", [], migrate_down)  
+def run_tests(target, source, env):
+    command = f"{EXEC} {APP_CONTAINER} {TEST}"
+    return os.system(command)
+
+
+Command("storages", [], storages)
+Command("storages-down", [], storages_down)
+Command("storages-logs", [], storages_logs)
+Command("up", [], app)
+Command("down", [], app_down)
+Command("logs", [], app_logs)
+Command("migrations", [], migrations)
+Command("auto-migrations", [], auto_migrations)
+Command("migrate-up", [], migrate_up)
+Command("migrate-down", [], migrate_down)
+Command("migrate-down", [], migrate_down)
+Command("run-tests", [], run_tests)

@@ -1,4 +1,4 @@
-import asyncio
+from fastapi import FastAPI
 
 import pytest
 import pytest_asyncio
@@ -16,11 +16,7 @@ from app.utils.unitofwork import (
 )
 
 
-@pytest.fixture(scope="session")
-def event_loop():
-    loop = asyncio.get_event_loop()
-    yield loop
-    loop.close()
+# TODO: Add clearing of redis
 
 
 @pytest_asyncio.fixture(autouse=True)
@@ -32,9 +28,19 @@ async def prepare_database():
         await conn.run_sync(BaseModel.metadata.drop_all)
 
 
-@pytest_asyncio.fixture()
-async def async_client():
-    app = create_app()
+@pytest.fixture
+async def app():
+    return create_app()
+
+
+@pytest.fixture
+async def uow():
+    async with TestUnitOfWork() as uow:
+        yield uow
+
+
+@pytest.fixture
+async def async_client(app: FastAPI):
     app.dependency_overrides[UnitOfWork] = TestUnitOfWork
     async with AsyncClient(
         transport=ASGITransport(app=app),

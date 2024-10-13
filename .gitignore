@@ -165,3 +165,4 @@ actions/*
 .sconsign.dblite
 ToDo.md
 certificates/
+.env.docker

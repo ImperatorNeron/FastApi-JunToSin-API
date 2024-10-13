@@ -2,7 +2,7 @@ from app.models.roled_users import (
     EmployedUser,
     UnemployedUser,
 )
-from app.utils.repositories import SQLAlchemyRepository
+from app.utils.sql_repository import SQLAlchemyRepository
 
 
 class EmployedUserRepository(SQLAlchemyRepository):

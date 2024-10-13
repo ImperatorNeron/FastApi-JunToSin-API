@@ -2,16 +2,25 @@ services:
   postgres:
     image: postgres:17rc1-alpine
     environment:
-      POSTGRES_DB: ${APP_CONFIG__DATABASE__db_name}
-      POSTGRES_USER: ${APP_CONFIG__DATABASE__user}
-      POSTGRES_PASSWORD: ${APP_CONFIG__DATABASE__password}
+      POSTGRES_DB: ${POSTGRES_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     container_name: postgresql-container
     ports:
-      - "${APP_CONFIG__DATABASE__port}:5432"
+      - "${POSTGRES_PORT}:5432"
     volumes:
       - postgresql_data:/var/lib/postgresql/data
     env_file:
-      - ../.env
+      - ../.env.docker
+
+  redis:
+    image: redis:latest
+    container_name: redis-container
+    ports:
+      - "${REDIS_PORT}:6379"
+    restart: always
+    env_file:
+      - ../.env.docker
 
 volumes:
   postgresql_data:

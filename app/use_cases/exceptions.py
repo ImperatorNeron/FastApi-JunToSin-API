@@ -36,3 +36,10 @@ class InvalidUserRoleException(Exception):
     def __init__(self, message: str = "Invalid user role") -> None:
         self.message = message
         super().__init__(message)
+
+
+class UserAlreadyExistsError(Exception):
+
+    def __init__(self, message="User already exists or verified."):
+        self.message = message
+        super().__init__(self.message)
