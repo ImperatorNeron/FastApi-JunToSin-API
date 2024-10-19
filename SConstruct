@@ -13,7 +13,7 @@ ENV = "--env-file .env.docker"
 ALREV = "alembic revision"
 ALUP = "alembic upgrade"
 ALDOWN = "alembic downgrade"
-TEST = "pytest"
+TEST = "pytest --cache-clear"
 
 
 def storages(target, source, env):

@@ -10,6 +10,7 @@ from fastapi.security import OAuth2PasswordBearer
 from punq import Container
 from pydantic import EmailStr
 
+from app.api.responses import login_responses
 from app.api.v1.dependencies import UOWDep
 from app.schemas.api_response import ApiResponseSchema
 from app.schemas.auth_users import (
@@ -36,6 +37,7 @@ router = APIRouter(prefix="/auth", tags=["Users"])
 @router.post(
     "/login",
     response_model=TokenInfoSchema,
+    responses=login_responses,
 )
 async def login(
     username: Annotated[str, Form()],
