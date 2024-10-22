@@ -42,3 +42,4 @@ class UpdateTaskSchema(BaseModel):
     complexity: Optional[Complexity] = None
     status: Optional[Status] = None
     deadline: Optional[datetime] = None
+    unemployed_user_id: Optional[int] = None

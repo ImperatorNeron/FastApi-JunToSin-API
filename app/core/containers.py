@@ -2,9 +2,9 @@ from functools import lru_cache
 
 import punq
 
-from app.services.auth_users import (
-    AuthUserService,
-    BaseAuthUserService,
+from app.services.auth import (
+    AuthService,
+    BaseAuthService,
 )
 from app.services.code_senders import (
     BaseCodeSenderService,
@@ -14,19 +14,19 @@ from app.services.codes import (
     BaseCodeService,
     RedisCacheCodeService,
 )
-from app.services.roled_users import (
-    EmployedUserService,
-    UnemployedUserService,
-)
 from app.services.tokens import (
     AbstractJWTTokenService,
     JWTTokenService,
 )
-from app.use_cases.login import LoginUserUseCase
-from app.use_cases.registration import RegisterUserUseCase
-from app.use_cases.send_varification_code import SendVerificationCodeUseCase
-from app.use_cases.user_profile import GetUserProfileUseCase
-from app.use_cases.verify import VerifyUseCase
+from app.services.users import (
+    EmployedUserService,
+    UnemployedUserService,
+)
+from app.use_cases.auth.login import LoginUserUseCase
+from app.use_cases.auth.registration import RegisterUserUseCase
+from app.use_cases.auth.send_varification_code import SendVerificationCodeUseCase
+from app.use_cases.auth.verify import VerifyUseCase
+from app.use_cases.users.user_profile import GetUserProfileUseCase
 
 
 @lru_cache(1)
@@ -41,7 +41,7 @@ def _initialize_container() -> punq.Container:
     container.register(EmployedUserService)
     container.register(AbstractJWTTokenService, JWTTokenService)
     container.register(UnemployedUserService)
-    container.register(BaseAuthUserService, AuthUserService)
+    container.register(BaseAuthService, AuthService)
     container.register(BaseCodeService, RedisCacheCodeService)
     container.register(BaseCodeSenderService, EmailSenderService)
 

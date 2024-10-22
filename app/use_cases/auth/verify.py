@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from pydantic import EmailStr
 
 from app.schemas.auth_users import UpdateUserVerificationSchema
-from app.services.auth_users import BaseAuthUserService
+from app.services.auth import BaseAuthService
 from app.services.codes import BaseCodeService
 from app.utils.unitofwork import IUnitOfWork
 
@@ -11,7 +11,7 @@ from app.utils.unitofwork import IUnitOfWork
 @dataclass
 class VerifyUseCase:
 
-    auth_user_service: BaseAuthUserService
+    auth_user_service: BaseAuthService
     code_service: BaseCodeService
 
     async def execute(

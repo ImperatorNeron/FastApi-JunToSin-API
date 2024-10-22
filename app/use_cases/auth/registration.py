@@ -5,19 +5,19 @@ from app.schemas.auth_users import (
     ReadUserSchema,
     RegisterUserSchema,
 )
-from app.services.auth_users import BaseAuthUserService
-from app.services.roled_users import (
+from app.services.auth import BaseAuthService
+from app.services.tokens import AbstractJWTTokenService
+from app.services.users import (
     EmployedUserService,
     UnemployedUserService,
 )
-from app.services.tokens import AbstractJWTTokenService
 from app.use_cases.exceptions import InvalidUserRoleException
 from app.utils.unitofwork import IUnitOfWork
 
 
 @dataclass
 class RegisterUserUseCase:
-    auth_user_service: BaseAuthUserService
+    auth_user_service: BaseAuthService
     employed_user_service: EmployedUserService
     unemployed_user_service: UnemployedUserService
     token_service: AbstractJWTTokenService

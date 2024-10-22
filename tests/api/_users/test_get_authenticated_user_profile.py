@@ -35,7 +35,7 @@ async def test_get_authenticated_user_profile(
     assert token is not None
 
     response = await async_client.get(
-        url="/api/v1/auth/users/me", headers={"Authorization": f"Bearer {token}"},
+        url="/api/v1/users/me", headers={"Authorization": f"Bearer {token}"},
     )
 
     assert response.status_code == 200

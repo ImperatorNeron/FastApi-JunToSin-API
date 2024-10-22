@@ -3,6 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
 from app.models.auth_users import User
+from app.models.tasks import Task
 from app.repositories.exceptions import UnhandledRoleError
 from app.schemas.profiles import (
     EmployedUserProfileSchema,
@@ -39,7 +40,7 @@ class AuthUserRepository(SQLAlchemyRepository):
             ),
         )
 
-    async def _get_get_user_with_profile_result(
+    async def _get_user_with_profile_result(
         self,
         role: str,
         username: str,
@@ -54,5 +55,17 @@ class AuthUserRepository(SQLAlchemyRepository):
         return result.scalars().first()
 
     async def get_user_with_profile(self, username: str, role: str) -> BaseModel:
-        user_profile = await self._get_get_user_with_profile_result(role, username)
+        user_profile = await self._get_user_with_profile_result(role, username)
         return await self._return_valid_profile_schema(user_profile)
+
+    async def get_tasks_for_employed_user(self, user_id: int) -> list[BaseModel]:
+        result = await self.session.execute(
+            select(Task).where(Task.employed_user_id == user_id),
+        )
+        return [task.to_read_model() for task in result.scalars().all()]
+
+    async def get_tasks_for_unemployed_user(self, user_id: int) -> list[BaseModel]:
+        result = await self.session.execute(
+            select(Task).where(Task.unemployed_user_id == user_id),
+        )
+        return [task.to_read_model() for task in result.scalars().all()]

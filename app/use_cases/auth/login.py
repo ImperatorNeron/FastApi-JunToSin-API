@@ -5,7 +5,7 @@ from app.schemas.auth_users import (
     ReadUserWithPasswordSchema,
 )
 from app.schemas.tokens import TokenInfoSchema
-from app.services.auth_users import BaseAuthUserService
+from app.services.auth import BaseAuthService
 from app.services.tokens import AbstractJWTTokenService
 from app.use_cases.exceptions import InvalidCredentialsException
 from app.utils.unitofwork import IUnitOfWork
@@ -14,7 +14,7 @@ from app.utils.unitofwork import IUnitOfWork
 @dataclass
 class LoginUserUseCase:
 
-    auth_user_service: BaseAuthUserService
+    auth_user_service: BaseAuthService
     token_service: AbstractJWTTokenService
 
     async def _get_user_by_username(
