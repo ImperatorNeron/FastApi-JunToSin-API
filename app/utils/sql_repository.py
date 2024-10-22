@@ -65,17 +65,25 @@ class SQLAlchemyRepository(AbstractRepository):
         item = result.scalars().first()
         return item.to_read_model() if item else None
 
-    async def update_one(self, item_id: int, item_in: BaseModel):
-        item = await self.__get_one_model(item_id=item_id)
-
-        for key, value in item_in.model_dump(exclude_unset=True).items():
-            setattr(item, key, value)
-
+    async def update_one(
+        self,
+        item_id: int,
+        item_in: BaseModel,
+    ):
+        await self.session.execute(
+            update(self.model)
+            .where(self.model.id == item_id)
+            .values(item_in.model_dump(exclude_unset=True)),
+        )
         await self.session.commit()
-        return item.to_read_model()
+        updated_item = await self.__get_one_model(item_id=item_id)
+        return updated_item.to_read_model()
 
     async def update_one_by_field(
-        self, field_name: str, field_value: Any, item_in: BaseModel,
+        self,
+        field_name: str,
+        field_value: Any,
+        item_in: BaseModel,
     ):
         field = getattr(self.model, field_name)
 
