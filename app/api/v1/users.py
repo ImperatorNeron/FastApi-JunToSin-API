@@ -65,7 +65,7 @@ async def register(
 
 
 @router.get("/users/me")
-async def auth_user_check(
+async def get_authenticated_user_profile(
     container: Annotated[Container, Depends(get_container)],
     uow: UOWDep,
     token: Annotated[str, Depends(oauth2_scheme)],
