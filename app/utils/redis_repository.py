@@ -2,6 +2,7 @@ from abc import (
     ABC,
     abstractmethod,
 )
+from dataclasses import dataclass
 from typing import (
     Any,
     Optional,
@@ -22,10 +23,10 @@ class AbstractCacheRepository(ABC):
     async def delete(self, key: str) -> None: ...
 
 
+@dataclass(frozen=True)
 class RedisCacheRepository(AbstractCacheRepository):
 
-    def __init__(self, client: redis.Redis) -> None:
-        self.client = client
+    client: redis.Redis
 
     async def set(self, name: str, value: Any, expire: int) -> None:  # noqa
         await self.client.set(name=name, value=value, ex=expire)
