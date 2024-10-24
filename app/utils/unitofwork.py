@@ -41,33 +41,10 @@ class IUnitOfWork(ABC):
     async def rollback(self): ...
 
 
-class UnitOfWork(IUnitOfWork):
-
+class BaseUnitOfWork(IUnitOfWork):
     async def __aenter__(self):
-        self.session = database_helper.session_factory()
-        self.redis_client = await redis_helper.get_redis_client()
-        self.tasks = TaskRepository(self.session)
-        self.auth_users = AuthUserRepository(self.session)
-        self.employed_users = EmployedUserRepository(self.session)
-        self.unemployed_users = UnemployedUserRepository(self.session)
-        self.code_cache = RedisCacheRepository(self.redis_client)
-
-    async def __aexit__(self, *args):
-        await self.rollback()
-        await self.session.close()
-
-    async def commit(self):
-        await self.session.commit()
-
-    async def rollback(self):
-        await self.session.rollback()
-
-
-class TestUnitOfWork(IUnitOfWork):
-
-    async def __aenter__(self):
-        self.session = test_database_helper.session_factory()
-        self.redis_client = await test_redis_helper.get_redis_client()
+        self.session = await self._get_session()
+        self.redis_client = await self._get_redis_client()
         self.tasks = TaskRepository(self.session)
         self.auth_users = AuthUserRepository(self.session)
         self.employed_users = EmployedUserRepository(self.session)
@@ -84,3 +61,27 @@ class TestUnitOfWork(IUnitOfWork):
 
     async def rollback(self):
         await self.session.rollback()
+
+    @abstractmethod
+    async def _get_session(self): ...
+
+    @abstractmethod
+    async def _get_redis_client(self): ...
+
+
+class UnitOfWork(BaseUnitOfWork):
+
+    async def _get_session(self):
+        return database_helper.session_factory()
+
+    async def _get_redis_client(self):
+        return await redis_helper.get_redis_client()
+
+
+class TestUnitOfWork(BaseUnitOfWork):
+
+    async def _get_session(self):
+        return test_database_helper.session_factory()
+
+    async def _get_redis_client(self):
+        return await test_redis_helper.get_redis_client()
