@@ -2,101 +2,151 @@ from abc import (
     ABC,
     abstractmethod,
 )
-from typing import Any
+from typing import (
+    Any,
+    Optional,
+)
 
 from pydantic import BaseModel
 from sqlalchemy import (
+    delete,
+    insert,
     Result,
     select,
     update,
 )
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.models.base import BaseModel as Model
+
 
 class AbstractRepository(ABC):
     @abstractmethod
-    async def get_all():
-        raise NotImplementedError
+    async def fetch_all(
+        self,
+    ) -> Optional[list[BaseModel]]: ...
 
     @abstractmethod
-    async def add_one():
-        raise NotImplementedError
+    async def create(
+        self,
+        item_in: BaseModel,
+    ) -> BaseModel: ...
 
     @abstractmethod
-    async def get_one():
-        raise NotImplementedError
+    async def fetch_by_id(
+        self,
+        item_id: int,
+    ) -> Optional[BaseModel]: ...
 
     @abstractmethod
-    async def update_one():
-        raise NotImplementedError
+    async def fetch_by_attribute(
+        self,
+        name: str,
+        value: Any,
+    ) -> Optional[BaseModel]: ...
 
     @abstractmethod
-    async def delete_one():
-        raise NotImplementedError
+    async def update_by_id(
+        self,
+        item_id: int,
+        item_in: BaseModel,
+    ) -> BaseModel: ...
+
+    @abstractmethod
+    async def update_by_field(
+        self,
+        name: int,
+        value: Any,
+        item_in: BaseModel,
+    ) -> BaseModel: ...
+
+    @abstractmethod
+    async def remove_by_id(
+        self,
+        item_id: int,
+    ) -> None: ...
 
 
 class SQLAlchemyRepository(AbstractRepository):
-    model = None
+    model: Model = None
 
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def __get_one_model(self, item_id: int):
-        item = await self.session.get(self.model, item_id)
-        return item
-
-    async def get_all(self):
-        result: "Result" = await self.session.execute(select(self.model))
+    async def fetch_all(self) -> Optional[list[BaseModel]]:
+        stmt = select(self.model)
+        result: Result = await self.session.execute(stmt)
         return [item.to_read_model() for item in list(result.scalars().all())]
 
-    async def add_one(self, item_in: BaseModel):
-        item = self.model(**item_in.model_dump())
-        self.session.add(item)
+    async def create(self, item_in: BaseModel) -> BaseModel:
+        stmt = insert(self.model).values(**item_in.model_dump()).returning(self.model)
+        result: Result = await self.session.execute(stmt)
         await self.session.commit()
-        return item.to_read_model()
-
-    async def get_one(self, item_id: int):
-        item = await self.__get_one_model(item_id=item_id)
-        return item.to_read_model()
-
-    async def get_one_by_field(self, field_name: str, value):
-        field = getattr(self.model, field_name, None)
-        result = await self.session.execute(select(self.model).where(field == value))
         item = result.scalars().first()
-        return item.to_read_model() if item else None
+        return item.to_read_model()
 
-    async def update_one(
+    async def fetch_by_id(self, item_id: int) -> Optional[BaseModel]:
+        item: Model = await self.session.get(self.model, item_id)
+
+        if item:
+            return item.to_read_model()
+
+    async def fetch_by_attribute(
+        self,
+        name: str,
+        value: Any,
+    ) -> Optional[BaseModel]:
+        field = getattr(self.model, name, None)
+
+        if field is None:
+            # TODO: add custom exception
+            raise ValueError(f"Field '{name}' does not exist in the model.")
+        stmt = select(self.model).where(field == value)
+        result = await self.session.execute(stmt)
+        item = result.scalars().first()
+
+        if item:
+            return item.to_read_model()
+
+    async def update_by_id(
         self,
         item_id: int,
         item_in: BaseModel,
-    ):
-        await self.session.execute(
+    ) -> Optional[BaseModel]:
+        stmt = (
             update(self.model)
             .where(self.model.id == item_id)
-            .values(item_in.model_dump(exclude_unset=True)),
+            .values(item_in.model_dump(exclude_unset=True))
+            .returning(self.model)
         )
+
+        result: Result = await self.session.execute(stmt)
         await self.session.commit()
-        updated_item = await self.__get_one_model(item_id=item_id)
-        return updated_item.to_read_model()
+        updated_item: Model = result.scalars().first()
 
-    async def update_one_by_field(
+        if updated_item:
+            return updated_item.to_read_model()
+
+    async def update_by_field(
         self,
-        field_name: str,
-        field_value: Any,
+        name: str,
+        value: Any,
         item_in: BaseModel,
-    ):
-        field = getattr(self.model, field_name)
+    ) -> BaseModel:
+        field = getattr(self.model, name)
 
-        result: "Result" = await self.session.execute(
+        stmt = (
             update(self.model)
-            .where(field == field_value)
+            .where(field == value)
             .values(**item_in.model_dump(exclude_unset=True))
             .returning(self.model),
         )
+        result: Result = await self.session.execute(stmt)
         await self.session.commit()
-        return result.scalars().first().to_read_model()
+        updated_item: Model = result.scalars().first()
+        return updated_item.to_read_model()
 
-    async def delete_one(self, item_id: int):
-        item = await self.__get_one_model(item_id=item_id)
-        await self.session.delete(item)
+    async def remove_by_id(self, item_id: int) -> None:
+        stmt = delete(self.model).where(self.model.id == item_id)
+        await self.session.execute(stmt)
         await self.session.commit()

@@ -31,7 +31,7 @@ async def test_is_registered(
         json=auth_user_payload.model_dump(mode="json"),
     )
     assert response.status_code == 200
-    user_in_db = await uow.auth_users.get_one_by_field(
+    user_in_db = await uow.auth_users.fetch_by_attribute(
         "username",
         auth_user_payload.username,
     )

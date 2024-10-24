@@ -59,7 +59,7 @@ class UserService(BaseUserService):
         username: str,
     ) -> list[BaseModel]:
         async with uow:
-            user = await uow.auth_users.get_one_by_field("username", username)
+            user = await uow.auth_users.fetch_by_attribute("username", username)
             # TODO: do normal error
             if user is None:
                 raise ValueError("User wasn`t found")
@@ -77,7 +77,7 @@ class EmployedUserService(BaseRoledUserService):
         uow: IUnitOfWork,
     ) -> None:
         user_in = CreateEmployedUserSchema(user_id=user_id)
-        await uow.employed_users.add_one(item_in=user_in)
+        await uow.employed_users.create(item_in=user_in)
 
 
 class UnemployedUserService(BaseRoledUserService):
@@ -88,4 +88,4 @@ class UnemployedUserService(BaseRoledUserService):
         uow: IUnitOfWork,
     ) -> None:
         user_in = CreateUnemployedUserSchema(user_id=user_id)
-        await uow.unemployed_users.add_one(item_in=user_in)
+        await uow.unemployed_users.create(item_in=user_in)

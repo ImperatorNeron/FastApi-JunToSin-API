@@ -20,3 +20,5 @@ class BaseModel(DeclarativeBase):
         if table_title.endswith(("s", "x", "z", "ch", "sh")):
             return f"{table_title}es"
         return f"{table_title}s"
+
+    # TODO: add to_read_model abstract class

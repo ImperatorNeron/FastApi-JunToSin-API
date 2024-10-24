@@ -37,14 +37,14 @@ class AuthService(BaseAuthService):
         uow: IUnitOfWork,
         user_in: CreateUserSchema,
     ) -> ReadUserSchema:
-        return await uow.auth_users.add_one(item_in=user_in)
+        return await uow.auth_users.create(item_in=user_in)
 
     async def get_user_by_username(
         self,
         uow: IUnitOfWork,
         username: str,
     ):
-        return await uow.auth_users.get_one_by_field(
+        return await uow.auth_users.fetch_by_attribute(
             "username",
             username,
         )
@@ -54,7 +54,7 @@ class AuthService(BaseAuthService):
         uow: IUnitOfWork,
         email: EmailStr,
     ):
-        user = await uow.auth_users.get_one_by_field("email", email)
+        user = await uow.auth_users.fetch_by_attribute("email", email)
         return user is not None and not user.is_verified
 
     async def update_user_by_email(
@@ -63,8 +63,8 @@ class AuthService(BaseAuthService):
         email: EmailStr,
         update_data: BaseModel,
     ):
-        return await uow.auth_users.update_one_by_field(
-            field_name="email",
-            field_value=email,
+        return await uow.auth_users.update_by_field(
+            name="email",
+            value=email,
             item_in=update_data,
         )
