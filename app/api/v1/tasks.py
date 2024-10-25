@@ -25,7 +25,7 @@ async def get_tasks(
     uow: UOWDep,
 ):
     return ApiResponseSchema(
-        data=ReadListTaskSchema(tasks=await TaskService().get_all(uow=uow)),
+        data=ReadListTaskSchema(tasks=await TaskService().fetch_all(uow=uow)),
     )
 
 
@@ -38,7 +38,7 @@ async def add_task(
     uow: UOWDep,
 ):
     return ApiResponseSchema(
-        data=await TaskService().add_task(
+        data=await TaskService().create(
             task_in=task_in,
             uow=uow,
         ),
@@ -54,7 +54,7 @@ async def get_task(
     uow: UOWDep,
 ):
     return ApiResponseSchema(
-        data=await TaskService().get_task(
+        data=await TaskService().fetch_by_id(
             task_id=task_id,
             uow=uow,
         ),
@@ -71,7 +71,7 @@ async def update_task(
     uow: UOWDep,
 ):
     return ApiResponseSchema(
-        data=await TaskService().update_task(
+        data=await TaskService().update_by_id(
             task_id=task_id,
             task_in=task_in,
             uow=uow,
@@ -87,7 +87,7 @@ async def delete_task(
     task_id: int,
     uow: UOWDep,
 ):
-    await TaskService().delete_task(
+    await TaskService().remove_by_id(
         task_id=task_id,
         uow=uow,
     )

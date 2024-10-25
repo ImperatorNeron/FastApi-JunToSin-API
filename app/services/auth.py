@@ -8,7 +8,7 @@ from pydantic import (
     EmailStr,
 )
 
-from app.schemas.auth_users import (
+from app.schemas.users import (
     CreateUserSchema,
     ReadUserSchema,
 )
@@ -18,16 +18,33 @@ from app.utils.unitofwork import IUnitOfWork
 class BaseAuthService(ABC):
 
     @abstractmethod
-    async def register(): ...
+    async def register(
+        self,
+        uow: IUnitOfWork,
+        user_in: CreateUserSchema,
+    ) -> BaseModel: ...
 
     @abstractmethod
-    async def get_user_by_username(): ...
+    async def get_user_by_username(
+        self,
+        uow: IUnitOfWork,
+        username: str,
+    ) -> BaseModel: ...
 
     @abstractmethod
-    async def is_unverified_user_by_email(): ...
+    async def is_unverified_user_by_email(
+        self,
+        uow: IUnitOfWork,
+        email: EmailStr,
+    ) -> bool: ...
 
     @abstractmethod
-    async def update_user_by_email(): ...
+    async def update_user_by_email(
+        self,
+        uow: IUnitOfWork,
+        email: EmailStr,
+        update_data: BaseModel,
+    ) -> BaseModel: ...
 
 
 class AuthService(BaseAuthService):
@@ -37,24 +54,21 @@ class AuthService(BaseAuthService):
         uow: IUnitOfWork,
         user_in: CreateUserSchema,
     ) -> ReadUserSchema:
-        return await uow.auth_users.create(item_in=user_in)
+        return await uow.users.create(item_in=user_in)
 
     async def get_user_by_username(
         self,
         uow: IUnitOfWork,
         username: str,
-    ):
-        return await uow.auth_users.fetch_by_attribute(
-            "username",
-            username,
-        )
+    ) -> ReadUserSchema:
+        return await uow.users.fetch_one_by_attributes(username=username)
 
     async def is_unverified_user_by_email(
         self,
         uow: IUnitOfWork,
         email: EmailStr,
-    ):
-        user = await uow.auth_users.fetch_by_attribute("email", email)
+    ) -> bool:
+        user = await uow.users.fetch_one_by_attributes(email=email)
         return user is not None and not user.is_verified
 
     async def update_user_by_email(
@@ -62,9 +76,8 @@ class AuthService(BaseAuthService):
         uow: IUnitOfWork,
         email: EmailStr,
         update_data: BaseModel,
-    ):
-        return await uow.auth_users.update_by_field(
-            name="email",
-            value=email,
+    ) -> ReadUserSchema:
+        return await uow.users.update_by_attributes(
             item_in=update_data,
+            email=email,
         )

@@ -21,16 +21,31 @@ from app.settings.settings import settings
 class AbstractJWTTokenService(ABC):
 
     @abstractmethod
-    async def encode_jwt(): ...
+    async def encode_jwt(
+        payload: dict,
+        secret_key: str,
+        algorithm: str,
+        expire_minutes: int,
+        expire_timedelta: timedelta | None = None,
+    ) -> str: ...
 
     @abstractmethod
-    async def decode_jwt(): ...
+    async def decode_jwt(
+        token: str | bytes,
+        public_key: str,
+        algorithm: str,
+    ) -> None: ...
 
     @abstractmethod
-    async def hash_password(): ...
+    async def hash_password(
+        password: str,
+    ) -> bytes: ...
 
     @abstractmethod
-    def validate_password(): ...
+    def validate_password(
+        password: str,
+        hashed_password: bytes,
+    ) -> bool: ...
 
 
 class JWTTokenService:
@@ -60,7 +75,7 @@ class JWTTokenService:
         token: str | bytes,
         public_key: str = settings.auth_jwt.public_key_path.read_text(),
         algorithm: str = settings.auth_jwt.algorithm,
-    ):
+    ) -> None:
         try:
             payload = jwt.decode(token, public_key, [algorithm])
             return payload

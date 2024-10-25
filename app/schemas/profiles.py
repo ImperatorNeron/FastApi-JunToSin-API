@@ -1,8 +1,8 @@
-from app.schemas.auth_users import ReadUserSchema
 from app.schemas.roled_users import (
     BaseEmployedUserSchema,
     BaseUnemployedUserSchema,
 )
+from app.schemas.users import ReadUserSchema
 
 
 class UnemployedUserProfileSchema(

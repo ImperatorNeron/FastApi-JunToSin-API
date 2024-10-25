@@ -12,12 +12,12 @@ from pydantic import EmailStr
 from app.api.responses import login_responses
 from app.api.v1.dependencies import UOWDep
 from app.schemas.api_response import ApiResponseSchema
-from app.schemas.auth_users import (
+from app.schemas.tokens import TokenInfoSchema
+from app.schemas.users import (
     LoginUserSchema,
     ReadUserSchema,
     RegisterUserSchema,
 )
-from app.schemas.tokens import TokenInfoSchema
 from app.settings.containers import get_container
 from app.use_cases.auth.login import LoginUserUseCase
 from app.use_cases.auth.registration import RegisterUserUseCase

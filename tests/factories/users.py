@@ -2,7 +2,7 @@ from random import SystemRandom
 
 import factory
 
-from app.schemas.auth_users import RegisterUserSchema
+from app.schemas.users import RegisterUserSchema
 from app.utils.enums import UserRole
 
 

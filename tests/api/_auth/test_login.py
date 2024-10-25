@@ -1,7 +1,7 @@
 import pytest
 from httpx import AsyncClient
 
-from app.schemas.auth_users import (
+from app.schemas.users import (
     LoginUserSchema,
     RegisterUserSchema,
 )

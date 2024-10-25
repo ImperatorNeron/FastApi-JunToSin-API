@@ -26,7 +26,7 @@ from app.use_cases.auth.login import LoginUserUseCase
 from app.use_cases.auth.registration import RegisterUserUseCase
 from app.use_cases.auth.send_varification_code import SendVerificationCodeUseCase
 from app.use_cases.auth.verify import VerifyUseCase
-from app.use_cases.users.user_profile import GetUserProfileUseCase
+from app.use_cases.users.user_profile import GetCurrentUserProfileUseCase
 
 
 @lru_cache(1)
@@ -48,7 +48,7 @@ def _initialize_container() -> punq.Container:
     # Use cases
     container.register(RegisterUserUseCase)
     container.register(LoginUserUseCase)
-    container.register(GetUserProfileUseCase)
+    container.register(GetCurrentUserProfileUseCase)
     container.register(SendVerificationCodeUseCase)
     container.register(VerifyUseCase)
 

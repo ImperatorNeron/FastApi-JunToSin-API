@@ -12,13 +12,13 @@ from app.utils.unitofwork import IUnitOfWork
 @dataclass
 class SendVerificationCodeUseCase:
 
-    auth_user_service: BaseAuthService
+    auth_service: BaseAuthService
     code_service: BaseCodeService
     sender_service: BaseCodeSenderService
 
     async def execute(self, email: EmailStr, uow: IUnitOfWork):
         async with uow:
-            is_user = await self.auth_user_service.is_unverified_user_by_email(
+            is_user = await self.auth_service.is_unverified_user_by_email(
                 uow=uow,
                 email=email,
             )

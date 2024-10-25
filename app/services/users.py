@@ -15,7 +15,7 @@ from app.utils.unitofwork import IUnitOfWork
 class BaseUserService(ABC):
 
     @abstractmethod
-    async def get_user_with_profile(
+    async def fetch_current_user_profile(
         self,
         uow: IUnitOfWork,
         username: str,
@@ -23,11 +23,60 @@ class BaseUserService(ABC):
     ) -> BaseModel: ...
 
     @abstractmethod
-    async def get_user_tasks(
+    async def fetch_user_profile(
+        self,
+        uow: IUnitOfWork,
+        username: str,
+    ) -> BaseModel: ...
+
+    @abstractmethod
+    async def fetch_user_tasks(
         self,
         uow: IUnitOfWork,
         username: str,
     ) -> list[BaseModel]: ...
+
+
+class UserService(BaseUserService):
+
+    async def fetch_current_user_profile(
+        self,
+        uow: IUnitOfWork,
+        username: str,
+        role: str,
+    ) -> BaseModel:
+        return await uow.users.fetch_user_profile(
+            username=username,
+            role=role,
+        )
+
+    async def fetch_user_profile(
+        self,
+        uow: IUnitOfWork,
+        username: str,
+    ):
+        async with uow:
+            user = await uow.users.fetch_one_by_attributes(username=username)
+            return await self.fetch_current_user_profile(
+                uow=uow,
+                username=user.username,
+                role=user.role.value,
+            )
+
+    async def fetch_user_tasks(
+        self,
+        uow: IUnitOfWork,
+        username: str,
+    ) -> list[BaseModel]:
+        async with uow:
+            user = await uow.users.fetch_one_by_attributes(username=username)
+            # TODO: do normal error
+            if user is None:
+                raise ValueError("User wasn`t found")
+            if user.role.value == "unemployed":
+                return await uow.tasks.fetch_by_attributes(unemployed_user_id=user.id)
+            if user.role.value == "employed":
+                return await uow.tasks.fetch_by_attributes(employed_user_id=user.id)
 
 
 class BaseRoledUserService(ABC):
@@ -38,35 +87,6 @@ class BaseRoledUserService(ABC):
         user_id: int,
         uow: IUnitOfWork,
     ) -> None: ...
-
-
-class UserService(BaseUserService):
-
-    async def get_user_with_profile(
-        self,
-        uow: IUnitOfWork,
-        username: str,
-        role: str,
-    ) -> BaseModel:
-        return await uow.auth_users.get_user_with_profile(
-            username=username,
-            role=role,
-        )
-
-    async def get_user_tasks(
-        self,
-        uow: IUnitOfWork,
-        username: str,
-    ) -> list[BaseModel]:
-        async with uow:
-            user = await uow.auth_users.fetch_by_attribute("username", username)
-            # TODO: do normal error
-            if user is None:
-                raise ValueError("User wasn`t found")
-            if user.role.value == "unemployed":
-                return await uow.auth_users.get_tasks_for_unemployed_user(user.id)
-            if user.role.value == "employed":
-                return await uow.auth_users.get_tasks_for_employed_user(user.id)
 
 
 class EmployedUserService(BaseRoledUserService):

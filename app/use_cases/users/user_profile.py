@@ -10,7 +10,7 @@ from app.utils.unitofwork import IUnitOfWork
 
 
 @dataclass
-class GetUserProfileUseCase:
+class GetCurrentUserProfileUseCase:
 
     auth_user_service: BaseUserService
     token_service: AbstractJWTTokenService
@@ -25,7 +25,7 @@ class GetUserProfileUseCase:
         role = payload.get("role")
 
         async with uow:
-            return await self.auth_user_service.get_user_with_profile(
+            return await self.auth_user_service.fetch_current_user_profile(
                 username=username,
                 role=role,
                 uow=uow,

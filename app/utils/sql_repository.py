@@ -39,10 +39,16 @@ class AbstractRepository(ABC):
     ) -> Optional[BaseModel]: ...
 
     @abstractmethod
-    async def fetch_by_attribute(
+    async def fetch_by_attributes(
+        self,
+        filters: dict,
+    ) -> Optional[list[BaseModel]]: ...
+
+    @abstractmethod
+    async def fetch_one_by_attributes(
         self,
         name: str,
-        value: Any,
+        filters: dict,
     ) -> Optional[BaseModel]: ...
 
     @abstractmethod
@@ -53,7 +59,7 @@ class AbstractRepository(ABC):
     ) -> BaseModel: ...
 
     @abstractmethod
-    async def update_by_field(
+    async def update_by_attributes(
         self,
         name: int,
         value: Any,
@@ -91,22 +97,29 @@ class SQLAlchemyRepository(AbstractRepository):
         if item:
             return item.to_read_model()
 
-    async def fetch_by_attribute(
+    async def fetch_by_attributes(
         self,
-        name: str,
-        value: Any,
-    ) -> Optional[BaseModel]:
-        field = getattr(self.model, name, None)
+        **filters: dict,
+    ) -> Optional[list[BaseModel]]:
 
-        if field is None:
-            # TODO: add custom exception
-            raise ValueError(f"Field '{name}' does not exist in the model.")
-        stmt = select(self.model).where(field == value)
+        stmt = select(self.model)
+
+        for name, value in filters.items():
+            field = getattr(self.model, name, None)
+
+            if field is None:
+                # TODO: add custom exception
+                raise ValueError(f"Field '{name}' does not exist in the model.")
+
+            stmt = stmt.where(field == value)
+
         result = await self.session.execute(stmt)
-        item = result.scalars().first()
 
-        if item:
-            return item.to_read_model()
+        return [item.to_read_model() for item in result.scalars().all()]
+
+    async def fetch_one_by_attributes(self, **filters: dict) -> Optional[BaseModel]:
+        results = await self.fetch_by_attributes(**filters)
+        return results[0] if results else None
 
     async def update_by_id(
         self,
@@ -127,20 +140,27 @@ class SQLAlchemyRepository(AbstractRepository):
         if updated_item:
             return updated_item.to_read_model()
 
-    async def update_by_field(
+    async def update_by_attributes(
         self,
-        name: str,
-        value: Any,
         item_in: BaseModel,
+        **filters: dict,
     ) -> BaseModel:
-        field = getattr(self.model, name)
+        stmt = update(self.model)
+        for name, value in filters.items():
+            field = getattr(self.model, name, None)
 
-        stmt = (
-            update(self.model)
-            .where(field == value)
-            .values(**item_in.model_dump(exclude_unset=True))
-            .returning(self.model),
-        )
+            if field is None:
+                # TODO: add custom exception
+                raise ValueError(f"Field '{name}' does not exist in the model.")
+
+            stmt = stmt.where(field == value)
+
+        stmt = stmt.values(
+            **item_in.model_dump(
+                exclude_unset=True,
+            ),
+        ).returning(self.model)
+
         result: Result = await self.session.execute(stmt)
         await self.session.commit()
         updated_item: Model = result.scalars().first()

@@ -1,7 +1,7 @@
 import pytest
 from httpx import AsyncClient
 
-from app.schemas.auth_users import RegisterUserSchema
+from app.schemas.users import RegisterUserSchema
 
 
 @pytest.mark.asyncio(loop_scope="session")

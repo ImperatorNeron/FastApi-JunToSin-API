@@ -17,7 +17,7 @@ from app.models.mixins import (
     IdIntPkMixin,
     UpdateCreateDateTimeMixin,
 )
-from app.schemas.auth_users import ReadUserWithPasswordSchema
+from app.schemas.users import ReadUserWithPasswordSchema
 from app.utils.enums import UserRole
 
 
